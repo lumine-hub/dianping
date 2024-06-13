@@ -9,11 +9,14 @@ import com.hmdp.service.ISeckillVoucherService;
 import com.hmdp.service.IVoucherOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.service.IVoucherService;
+import com.hmdp.utils.SimpleRedisLock;
 import com.hmdp.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**
@@ -31,6 +34,10 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     private IVoucherService voucherService;
     @Autowired
     private ISeckillVoucherService seckillVoucherService;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
 
     @Override
     public Result seckillVoucher(Long voucherId) {
@@ -52,9 +59,23 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
             return Result.fail("库存不足！");
         }
         Long userId = UserHolder.getUser().getId();
-        synchronized(userId.toString().intern()) {
-            return this.createVoucherOrder(voucherId);
+//        synchronized(userId.toString().intern()) {
+//            return this.createVoucherOrder(voucherId);
+//        }
+        SimpleRedisLock simpleRedisLock = new SimpleRedisLock("order:"+userId,stringRedisTemplate);
+        boolean isLock = simpleRedisLock.tryLock();
+        if (!isLock) {
+            return Result.fail("不允许重复下单");
         }
+
+        try {
+            return this.createVoucherOrder(voucherId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            simpleRedisLock.unlock();
+        }
+
     }
 
     @Transactional
