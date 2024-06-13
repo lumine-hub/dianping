@@ -45,7 +45,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
             // 尚未开始
             return Result.fail("秒杀已经结束！");
         }
-        // 4.判断库存是否充足
+//         4.判断库存是否充足
         if (voucher.getStock() < 1) {
             // 库存不足
             return Result.fail("库存不足！");

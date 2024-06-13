@@ -3,5 +3,8 @@
 <mapper namespace="com.hmdp.mapper.SeckillVoucherMapper">
 
 
-
+    <update id="updateStock">
+        update tb_seckill_voucher set stock=#{stock}-1
+        where stock > 0 and voucher_id = #{id}
+    </update>
 </mapper>

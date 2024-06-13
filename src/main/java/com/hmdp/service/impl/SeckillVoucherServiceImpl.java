@@ -1,5 +1,6 @@
 package com.hmdp.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.hmdp.dto.Result;
 import com.hmdp.entity.SeckillVoucher;
 import com.hmdp.mapper.SeckillVoucherMapper;
@@ -8,6 +9,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Wrapper;
 
 /**
  * <p>
@@ -29,8 +32,13 @@ public class SeckillVoucherServiceImpl extends ServiceImpl<SeckillVoucherMapper,
         if (seckillVoucher.getStock() - 1 < 0) {
             return false;
         }
-        seckillVoucher.setStock(seckillVoucher.getStock() - 1);
-        seckillVoucherMapper.updateById(seckillVoucher);
-        return true;
+//        seckillVoucher.setStock(seckillVoucher.getStock() - 1);
+//        seckillVoucherMapper.updateById(seckillVoucher);
+        int row = seckillVoucherMapper.updateStock(id, seckillVoucher.getStock() - 1);
+        if (row > 0) {
+            return true;
+        }
+        return false;
+
     }
 }
