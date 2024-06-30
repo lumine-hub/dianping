@@ -140,7 +140,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     @Override // max: 上次查询的最小时间戳， offset：上次结果中，与最小值一样的元素个数。其实还需要一个展示多少条数据，不过这个可以和前端约定后写死。
     public Result queryBlogOfFollow(Long max, Integer offset) {
         UserDTO user = UserHolder.getUser();
-        String key = RedisConstants.FEED_KEY;
+        String key = RedisConstants.FEED_KEY + user.getId();
 //        stringRedisTemplate.opsForZSet().reverseRangeByScoreWithScores()
         Set<ZSetOperations.TypedTuple<String>> typedTuples = stringRedisTemplate.opsForZSet()
                 .reverseRangeByScoreWithScores(key, 0, max, offset, 2);
