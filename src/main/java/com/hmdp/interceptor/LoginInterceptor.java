@@ -43,8 +43,14 @@ public class LoginInterceptor implements HandlerInterceptor {
 //        UserDTO user = BeanUtil.fillBeanWithMap(userMap, new UserDTO(), false);
 //        UserDTO user = (UserDTO) request.getSession().getAttribute("user");
         UserDTO user = new UserDTO();
-        user.setId(1010L);
-        user.setNickName("user_prwpi");
+        if (token == "1") {
+            user.setId(1010L);
+            user.setNickName("user_prwpi");
+        } else {
+            user.setId(1012L);
+            user.setNickName("user_a0dr9");
+        }
+
         if (user == null) {
             response.setStatus(401);
             return false;
